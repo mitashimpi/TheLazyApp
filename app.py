@@ -74,12 +74,13 @@ def update_users():
 
 @app.route('/cart', methods=['GET'])
 def get_from_cart():
-    content = request.get_json()
-    user_id = content["user_id"]
+    content = request.args
+    user_id = content['userid']
+    print(user_id)
     response = es.search(
-        index='user',
-        doc_type='users',
-        body={"query":{"bool":{"should":[{"match":{"_id":user_id}}, {"match":{"status": 0}}], "minimum_should_match": 2}}})
+        index='item',
+        doc_type='item',
+        body={"query":{"bool":{"should":[{"match":{"user_id":user_id}}, {"match":{"status": 0}}], "minimum_should_match": 2}}})
 
     print(response)
     if response['hits']['total'] == 0:
