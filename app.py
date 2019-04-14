@@ -22,37 +22,24 @@ def introduction():
 @app.route('/users', methods=['GET'])
 def get_users():
     content = request.args
-    print(content)
-    '''
+    role = content['role']
     response = es.search(
         index='user',
         doc_type='users',
-        body=content)
-    '''
-    if content['userrole'] == 'lazybob':
-        users = [{
-            "_id": "AWoam9-WYuK02M0NODA6",
-            "role": "lazybob",
-            "email": "abc@abc.com",
-            "first_name": "Mita",
-            "last_name": "Shimpi",
-            "location": {
-                "longitude": 0.0,
-                "latitude": 0.0
-            }
-        }]
-    if content['userrole'] == 'shopper':
-        users = [{
-            "_id": "AWoam9-WYuK00NODA6",
-            "role": "shopper",
-            "email": "abc@abc.com",
-            "first_name": "Usmann",
-            "last_name": "Usmann",
-            "location": {
-                "longitude": 0.0,
-                "latitude": 0.0
-            }
-        }]
+        body={"query": {"bool": {"should": [{"match": {"role": role}}],
+                                 "minimum_should_match": 2}}})
+    print(response)
+    if response['hits']['total'] == 0:
+        return jsonify([])
+
+    users = []
+    for hit in response['hits']['hits']:
+        user = hit['_source']
+        user['_id'] = hit['_id']
+        users.append(user)
+
+    print(users)
+    return jsonify(users)
 
     # if response['hits']['total'] == 0:
     #    return []
