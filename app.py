@@ -11,7 +11,6 @@ from store import Store
 app = Flask(__name__)
 
 es = Elasticsearch(hosts="http://54.162.209.228:9200")
-es.indices.create(index='user', ignore=400)
 
 
 @app.route('/', methods=['GET'])
@@ -22,25 +21,43 @@ def introduction():
 
 @app.route('/users', methods=['GET'])
 def get_users():
-    args = request.args
-    print(args)  # For debugging
-    user = UserRole(args['userrole'])
-    if user is UserRole.LAZYBOB:
-        print('User is ' + str(user))
-    elif user is UserRole.SHOPPER:
-        print('User is a ' + str(user))
-    users = [
-  {
-    "email": "abc@abc.com",
-    "first_name": "Yuka",
-    "last_name": "Black",
-    "location": {
-      "longitude": 0,
-      "latitude": 0
-    }
-  }
-]
+    content = request.args
+    print(content)
+    '''
+    response = es.search(
+        index='user',
+        doc_type='users',
+        body=content)
+    '''
+    if content['userrole'] == 'lazybob':
+        users = [{
+            "_id": "AWoam9-WYuK02M0NODA6",
+            "role": "lazybob",
+            "email": "abc@abc.com",
+            "first_name": "Mita",
+            "last_name": "Shimpi",
+            "location": {
+                "longitude": 0.0,
+                "latitude": 0.0
+            }
+        }]
+    if content['userrole'] == 'shopper':
+        users = [{
+            "_id": "AWoam9-WYuK00NODA6",
+            "role": "shopper",
+            "email": "abc@abc.com",
+            "first_name": "Usmann",
+            "last_name": "Usmann",
+            "location": {
+                "longitude": 0.0,
+                "latitude": 0.0
+            }
+        }]
 
+    # if response['hits']['total'] == 0:
+    #    return []
+
+    # users = [hit['_source'] for hit in response['hits']['hits']]
     return jsonify(users)
 
 
@@ -88,7 +105,19 @@ def update_order():
     content = request.get_json()
     body = {
         "doc": {
-            "@status": 1
+            "status": 1
+        }
+    }
+    es.update(index='item', doc_type='item', id=content['_id'], body=body)
+    return 'Item added to order'
+
+
+@app.route('/role', methods=['PUT'])
+def update_role():
+    content = request.get_json()
+    body = {
+        "doc": {
+            "role": 1
         }
     }
     es.update(index='item', doc_type='item', id=content['_id'], body=body)
