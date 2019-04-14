@@ -9,7 +9,7 @@ from store import Store
 
 app = Flask(__name__)
 
-es = Elasticsearch("http://54.162.209.228:9200")
+es = Elasticsearch(hosts="http://54.162.209.228:9200")
 es.indices.create(index='user', ignore=400)
 
 
@@ -33,11 +33,12 @@ def get_users():
 
 @app.route('/users', methods=['PUT'])
 def update_users():
-    print('Adding/Updating user')
     content = request.get_json()
-    users = [User(user['first_name'], user['last_name'], user['email'], user['created_at'],
-                  Location(user['location']['longitude'], user['location']['latitude'])) for user in content['users']]
-    print(users)
+
+    # print("content:", content)
+    # user = content['first_name'], content['last_name'], content['email'], content['created_at'],
+    #               Location(user['location']['longitude'], user['location']['latitude']
+    es.index(index="user", body=content, doc_type="users")
     return 'User added/updated successfully'
 
 
@@ -50,10 +51,11 @@ def get_from_cart():
 @app.route('/cart', methods=['PUT'])
 def put_in_cart():
     content = request.get_json()
-    items = [
-        Item(item['name'], Store(item['store']['name'], item['store']['location']), item['price'], item['size'],
-             item['description'], item['created_by']) for item in content['items']]
-    print(items)
+    content["status"] = 0
+    # items = [
+    #     Item(item['name'], Store(item['store']['name'], item['store']['location']), item['price'], item['size'],
+    #          item['description'], item['created_by']) for item in content['items']]
+    es.index(index="item", body=content, doc_type="item")
     return "Cart updated"
 
 
