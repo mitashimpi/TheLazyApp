@@ -23,16 +23,42 @@ def introduction():
 def get_users():
     content = request.get_json()
     print(content)
+    '''
     response = es.search(
         index='user',
         doc_type='users',
         body=content)
+    '''
+    if content['role'] == 'lazybob':
+        users = [{
+            "_id": "AWoam9-WYuK02M0NODA6",
+            "role": "lazybob",
+            "email": "abc@abc.com",
+            "first_name": "Mita",
+            "last_name": "Shimpi",
+            "location": {
+                "longitude": 0.0,
+                "latitude": 0.0
+            }
+        }]
+    if content['role'] == 'shopper':
+        users = [{
+            "_id": "AWoam9-WYuK00NODA6",
+            "role": "shopper",
+            "email": "abc@abc.com",
+            "first_name": "Usmann",
+            "last_name": "Usmann",
+            "location": {
+                "longitude": 0.0,
+                "latitude": 0.0
+            }
+        }]
 
-    if response['hits']['total'] == 0:
-        return []
+    # if response['hits']['total'] == 0:
+    #    return []
 
-    users = [hit['_source'] for hit in response['hits']['hits']]
-    return users
+    # users = [hit['_source'] for hit in response['hits']['hits']]
+    return jsonify(users)
 
 
 @app.route('/users', methods=['PUT'])
@@ -79,6 +105,18 @@ def update_order():
     body = {
         "doc": {
             "status": 1
+        }
+    }
+    es.update(index='item', doc_type='item', id=content['_id'], body=body)
+    return 'Item added to order'
+
+
+@app.route('/role', methods=['PUT'])
+def update_role():
+    content = request.get_json()
+    body = {
+        "doc": {
+            "role": 1
         }
     }
     es.update(index='item', doc_type='item', id=content['_id'], body=body)
