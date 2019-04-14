@@ -21,7 +21,7 @@ def introduction():
 
 @app.route('/users', methods=['GET'])
 def get_users():
-    content = request.get_json()
+    content = request.args
     print(content)
     '''
     response = es.search(
@@ -29,7 +29,7 @@ def get_users():
         doc_type='users',
         body=content)
     '''
-    if content['role'] == 'lazybob':
+    if content['userrole'] == 'lazybob':
         users = [{
             "_id": "AWoam9-WYuK02M0NODA6",
             "role": "lazybob",
@@ -41,7 +41,7 @@ def get_users():
                 "latitude": 0.0
             }
         }]
-    if content['role'] == 'shopper':
+    if content['userrole'] == 'shopper':
         users = [{
             "_id": "AWoam9-WYuK00NODA6",
             "role": "shopper",
