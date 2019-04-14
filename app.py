@@ -87,9 +87,16 @@ def put_in_cart():
     return "Cart updated"
 
 
-@app.route('/order', methods=['GET'])
-def get_order_details():
-    return 'No order details available'
+@app.route('/order', methods=['PUT'])
+def update_order():
+    content = request.get_json()
+    body = {
+        "doc": {
+            "@status": 1
+        }
+    }
+    es.update(index='item', doc_type='item', id=content['_id'], body=body)
+    return 'Item added to order'
 
 
 if __name__ == '__main__':
