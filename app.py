@@ -57,26 +57,18 @@ def update_users():
 
 @app.route('/cart', methods=['GET'])
 def get_from_cart():
-    cart = {
-	"items": [
-		{
-			"name": "Ice-cream",
-			"description": "Ice-cream is cold",
-			"store": {
-				"name": "Target",
-				"location": {
-					"longitude": 0.0,
-					"latitude": 0.0
-				}
-			},
-			"price": 3.00,
-			"size": "Small",
-			"created_by": 1
-		}
-		]
-}
-    print('Cart is mocked!')
-    return jsonify(cart)
+    content = request.get_json()
+    user_id = content["user_id"]
+    response = ES.search(
+        index='users',
+        doc_type='user',
+        body={"user_id": user_id, "status": 0})
+
+    if response['hits']['total'] == 0:
+        return []
+
+    items = [hit['_source'] for hit in response['hits']['hits']]
+    return items
 
 
 @app.route('/cart', methods=['PUT'])
