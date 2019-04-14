@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 from elasticsearch import Elasticsearch
 from userrole import UserRole
 from item import Item
@@ -23,28 +24,57 @@ def introduction():
 def get_users():
     args = request.args
     print(args)  # For debugging
-    user = UserRole(args['user_type'])
+    user = UserRole(args['userrole'])
     if user is UserRole.LAZYBOB:
         print('User is ' + str(user))
     elif user is UserRole.SHOPPER:
         print('User is a ' + str(user))
-    return "User: " + str(user)
+    users = [
+  {
+    "email": "abc@abc.com",
+    "first_name": "Yuka",
+    "last_name": "Black",
+    "location": {
+      "longitude": 0,
+      "latitude": 0
+    }
+  }
+]
+
+    return jsonify(users)
 
 
 @app.route('/users', methods=['PUT'])
 def update_users():
     print('Adding/Updating user')
     content = request.get_json()
-    users = [User(user['first_name'], user['last_name'], user['email'], user['created_at'],
+    users = [User(user['first_name'], user['last_name'], user['email'],
                   Location(user['location']['longitude'], user['location']['latitude'])) for user in content['users']]
-    print(users)
-    return 'User added/updated successfully'
+    return 'User updated'
 
 
 @app.route('/cart', methods=['GET'])
 def get_from_cart():
-    print('Cart is empty!')
-    return "Empty cart!"
+    cart = {
+	"items": [
+		{
+			"name": "Ice-cream",
+			"description": "Ice-cream is cold",
+			"store": {
+				"name": "Target",
+				"location": {
+					"longitude": 0.0,
+					"latitude": 0.0
+				}
+			},
+			"price": 3.00,
+			"size": "Small",
+			"created_by": 1
+		}
+		]
+}
+    print('Cart is mocked!')
+    return jsonify(cart)
 
 
 @app.route('/cart', methods=['PUT'])
