@@ -11,7 +11,6 @@ from store import Store
 app = Flask(__name__)
 
 es = Elasticsearch(hosts="http://54.162.209.228:9200")
-es.indices.create(index='user', ignore=400)
 
 
 @app.route('/', methods=['GET'])
@@ -22,26 +21,18 @@ def introduction():
 
 @app.route('/users', methods=['GET'])
 def get_users():
-    args = request.args
-    print(args)  # For debugging
-    user = UserRole(args['userrole'])
-    if user is UserRole.LAZYBOB:
-        print('User is ' + str(user))
-    elif user is UserRole.SHOPPER:
-        print('User is a ' + str(user))
-    users = [
-  {
-    "email": "abc@abc.com",
-    "first_name": "Yuka",
-    "last_name": "Black",
-    "location": {
-      "longitude": 0,
-      "latitude": 0
-    }
-  }
-]
+    content = request.get_json()
+    print(content)
+    response = es.search(
+        index='user',
+        doc_type='users',
+        body=content)
 
-    return jsonify(users)
+    if response['hits']['total'] == 0:
+        return []
+
+    users = [hit['_source'] for hit in response['hits']['hits']]
+    return users
 
 
 @app.route('/users', methods=['PUT'])
@@ -59,7 +50,7 @@ def update_users():
 def get_from_cart():
     content = request.get_json()
     user_id = content["user_id"]
-    response = ES.search(
+    response = es.search(
         index='users',
         doc_type='user',
         body={"user_id": user_id, "status": 0})
@@ -87,7 +78,7 @@ def update_order():
     content = request.get_json()
     body = {
         "doc": {
-            "@status": 1
+            "status": 1
         }
     }
     es.update(index='item', doc_type='item', id=content['_id'], body=body)
