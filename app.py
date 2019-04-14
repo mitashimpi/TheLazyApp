@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 from elasticsearch import Elasticsearch
 from userrole import UserRole
 from item import Item
@@ -28,7 +29,8 @@ def get_users():
         print('User is ' + str(user))
     elif user is UserRole.SHOPPER:
         print('User is a ' + str(user))
-    return "User: " + str(user)
+    users = {}
+    return jsonify(users)
 
 
 @app.route('/users', methods=['PUT'])
