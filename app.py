@@ -60,15 +60,16 @@ def get_from_cart():
     content = request.get_json()
     user_id = content["user_id"]
     response = es.search(
-        index='users',
-        doc_type='user',
-        body={"user_id": user_id, "status": 0})
+        index='user',
+        doc_type='users',
+        body={"query":{"bool":{"should":[{"match":{"_id":user_id}}, {"match":{"status": 0}}], "minimum_should_match": 2}}})
 
+    print(response)
     if response['hits']['total'] == 0:
-        return []
+        return jsonify([])
 
     items = [hit['_source'] for hit in response['hits']['hits']]
-    return items
+    return jsonify(items)
 
 
 @app.route('/cart', methods=['PUT'])
