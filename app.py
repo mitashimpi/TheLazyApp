@@ -62,46 +62,5 @@ def get_order_details():
     return 'No order details available'
 
 
-# ---------------------------------------------------------------------------------------------------------------------
-'''
-class Introduction(Resource):
-    def get(self):
-        print("Call made to introduction()")
-        return 'This is TheLazyApp!'
-
-
-class FindUsers(Resource):
-    def get(self):
-        args = request.args
-        print(args)  # For debugging
-        user = User(args['user_type'])
-        if user is User.LAZYBOB:
-            print('User is ' + str(user))
-        elif user is User.SHOPPER:
-            print('User is a ' + str(user))
-        return "User: " + str(user)
-
-
-class Cart(Resource):
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('items', type=str, location='json')
-        super(Cart, self).__init__()
-
-    def put(self):
-        args = request.getjson()
-        print(args)
-        print('Adding to cart')
-
-    def get(self):
-        print('Cart is empty!')
-
-
-api.add_resource(Introduction, '/')
-api.add_resource(FindUsers, '/find')
-api.add_resource(Cart, '/cart')
-
-'''
-
 if __name__ == '__main__':
     app.run()
