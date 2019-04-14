@@ -59,7 +59,7 @@ def update_users():
 def get_from_cart():
     content = request.get_json()
     user_id = content["user_id"]
-    response = ES.search(
+    response = es.search(
         index='users',
         doc_type='user',
         body={"user_id": user_id, "status": 0})
